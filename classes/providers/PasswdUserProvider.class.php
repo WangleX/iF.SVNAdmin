@@ -24,14 +24,22 @@ namespace svnadmin\providers
   {
     private $m_userfile = NULL;
     private $m_init_done = false;
+    private static $m_type="";
     private static $m_instance = NULL;
-
-    public static function getInstance()
+    //private static $m_type="";
+    
+    private function __construct($type){
+        $this->m_type=$type;
+    }
+    
+    public static function getInstance($type="")
     {
+      self::$m_type=$type;
       if( self::$m_instance == NULL )
       {
-        self::$m_instance = new PasswdUserProvider;
+        self::$m_instance = new PasswdUserProvider($type);
       }
+      //self::$m_instance->m_type=$type;
       return self::$m_instance;
     }
 
@@ -45,7 +53,7 @@ namespace svnadmin\providers
       if( !$this->m_init_done )
       {
         $this->m_init_done = true;
-        $this->m_userfile = new \IF_HtPasswd($appEngine->getConfig()->getValue("Users:passwd", "SVNUserFile"));
+        $this->m_userfile = new \IF_HtPasswd($appEngine->getConfig()->getValue("Users:passwd", "SVNUserFile"),$this->m_type);
         return $this->m_userfile->init();
       }
       return false;

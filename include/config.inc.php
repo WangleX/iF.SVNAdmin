@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.
  */
-error_reporting(E_ERROR);
+error_reporting(E_ALL);
 include_once("./classes/util/global.func.php");
 set_exception_handler('exception_handler');
 
@@ -97,8 +97,8 @@ include_once( "./classes/core/Exceptions.class.php" );
  * iF.SVNAdmin version.
  */
 define("MAJOR_VERSION", "1");
-define("MINOR_VERSION", "6.3");
-define("VERSION_EXTRA", "UNOFFICIAL");
+define("MINOR_VERSION", "6.2");
+define("VERSION_EXTRA", "");
 
 /**
  * Constant ACL modules.
@@ -127,8 +127,6 @@ define("ACL_ACTION_CHANGEPASS_OTHER",	"changepassother");	// ACL_MOD_USER only!
 define("ACL_ACTION_SYNCHRONIZE",		"synchronize");		// ACL_MOD_UPDATE only!
 define("ACL_ACTION_CHANGE",				"change");			// ACL_MOD_SETTINGS only (atm...)!
 define("ACL_ACTION_DUMP",				"dump");			// ACL_MOD_REPO
-define("ACL_ACTION_ASSIGN_ADMIN_ROLE", "assignadmin"); // ACL_MOD_ROLE
-define("ACL_ACTION_UNASSIGN_ADMIN_ROLE", "unassignadmin"); // ACL_MOD_ROLE
 
 /*
  * Switch current locale procecure.
@@ -176,7 +174,7 @@ if ($cfg->getValue("Engine:Providers", "UserViewProviderType") == "passwd")
 {
   include_once($ifcorelib_path."IF_HtPasswd.class.php");
   include_once("./classes/providers/PasswdUserProvider.class.php");
-  $userView = \svnadmin\providers\PasswdUserProvider::getInstance();
+  $userView = \svnadmin\providers\PasswdUserProvider::getInstance($cfg->getValue("Engine:Providers", "AuthenticationStatus"));
   $appEngine->setUserViewProvider( $userView );
 }
 elseif ($cfg->getValue("Engine:Providers", "UserViewProviderType") == "digest")
@@ -190,7 +188,7 @@ elseif ($cfg->getValue("Engine:Providers", "UserViewProviderType") == "ldap")
 {
 	$userView = null;
 	include_once("./classes/providers/ldap/LdapUserViewProvider.class.php");
-
+  
 	if ($cfg->getValueAsBoolean('Ldap', 'CacheEnabled', false)) {
 		include_once("./classes/providers/ldap/CachedLdapUserViewProvider.class.php");
 		include_once("./include/ifcorelib/IF_JsonObjectStorage.class.php");
@@ -200,7 +198,6 @@ elseif ($cfg->getValue("Engine:Providers", "UserViewProviderType") == "ldap")
 		$userView = \svnadmin\providers\ldap\LdapUserViewProvider::getInstance();
 	}
 
-	$userView->setUserViewEnabled(true);
 	$appEngine->setUserViewProvider( $userView );
 }
 
@@ -212,7 +209,7 @@ if ($cfg->getValue("Engine:Providers", "UserEditProviderType") == "passwd")
 {
   include_once($ifcorelib_path."IF_HtPasswd.class.php");
   include_once( "./classes/providers/PasswdUserProvider.class.php" );
-  $userEdit = \svnadmin\providers\PasswdUserProvider::getInstance();
+  $userEdit = \svnadmin\providers\PasswdUserProvider::getInstance($cfg->getValue("Engine:Providers", "AuthenticationStatus"));
   $appEngine->setUserEditProvider( $userEdit );
 }
 if ($cfg->getValue("Engine:Providers", "UserEditProviderType") == "digest")
@@ -237,7 +234,7 @@ elseif($cfg->getValue("Engine:Providers", "GroupViewProviderType") == "ldap" && 
 	$groupView = null;
 	include_once("./classes/providers/ldap/LdapUserViewProvider.class.php");
 	include_once("./classes/providers/AuthFileGroupAndPathsProvider.class.php");
-
+	
 	if ($cfg->getValueAsBoolean('Ldap', 'CacheEnabled', false)) {
 		include_once("./classes/providers/ldap/CachedLdapUserViewProvider.class.php");
 		include_once("./include/ifcorelib/IF_JsonObjectStorage.class.php");
@@ -246,8 +243,7 @@ elseif($cfg->getValue("Engine:Providers", "GroupViewProviderType") == "ldap" && 
 	else {
 		$groupView = \svnadmin\providers\ldap\LdapUserViewProvider::getInstance();
 	}
-
-	$groupView->setGroupViewEnabled(true);
+	
 	$appEngine->setGroupViewProvider($groupView);
 }
 
@@ -305,8 +301,8 @@ if ($cfg->getValue("Engine:Providers", "RepositoryEditProviderType") == "svnclie
 /**
  * Authentication status.
  */
-if ($cfg->getValue("Engine:Providers", "AuthenticationStatus") == "basic")
-{
+//if ($cfg->getValue("Engine:Providers", "AuthenticationStatus") == "basic")
+//{
   include( "./classes/providers/EngineBaseAuthenticator.class.php" );
   session_start();
   $o = new \svnadmin\providers\EngineBaseAuthenticator;
@@ -321,7 +317,7 @@ if ($cfg->getValue("Engine:Providers", "AuthenticationStatus") == "basic")
     $appEngine->setAclManager($o);
     $appTemplate->setAcl($appEngine);
   }
-}
+//}
 
 /**
  * An administrator role MUST be defined, if the authentication is active.
