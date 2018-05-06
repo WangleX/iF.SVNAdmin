@@ -52,7 +52,7 @@ $appTR->loadModule("settings");
 ////////////////////////////////////////////////////////////////////////////////
 // Fetch request parameters.
 ////////////////////////////////////////////////////////////////////////////////
-
+$pPasswdEncryptionType = get_request_var("PasswdEncryptionType");
 $pUserViewProviderType = get_request_var("UserViewProviderType");
 $pUserEditProviderType = get_request_var("UserEditProviderType");
 $pGroupViewProviderType = get_request_var("GroupViewProviderType");
@@ -98,6 +98,7 @@ if (check_request_var("firststart"))
 
 if (check_request_var("save"))
 {
+        $cfgEngine->setValue("Engine:Providers", "AuthenticationStatus", $pPasswdEncryptionType);
 	$cfgEngine->setValue("Engine:Providers", "UserViewProviderType", $pUserViewProviderType);
 	$cfgEngine->setValue("Engine:Providers", "UserEditProviderType", $pUserEditProviderType);
 	$cfgEngine->setValue("Engine:Providers", "GroupViewProviderType", $pGroupViewProviderType);
@@ -469,6 +470,11 @@ $svnAuthFile = $cfgEngine->getValue("Subversion","SVNAuthFile");
 $svnAuthFileEx = $cfgTpl->getValue("Subversion","SVNAuthFile");
 SetValue("SVNAuthFile", $svnAuthFile);
 SetValue("SVNAuthFileEx", $svnAuthFileEx);
+
+//PasswdEncryptionType
+$passwdEncryptionType = array("off", "basic", "advanced", "complex");
+array_unshift($passwdEncryptionType, $cfgEngine->getValue("Engine:Providers","AuthenticationStatus"));
+SetValue("passwdEncryptionType", $passwdEncryptionType);
 
 // UserViewProviderType
 $userViewProviderTypes = array(/*"off",*/ "passwd", "digest", "ldap");

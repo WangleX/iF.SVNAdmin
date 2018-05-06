@@ -99,6 +99,16 @@ $(document).ready(function(){
   </thead>
   <tbody>
     <tr>
+        <td>Passwd Encryption type:</td>
+        <td>
+        <select name="PasswdEncryptionType" id="PasswdEncryptionType">
+          <?php foreach(GetArrayValue("passwdEncryptionType") as $t): ?>
+          <option><?php print($t); ?></option>
+          <?php endforeach; ?>
+        </select>
+      </td>
+    </tr>
+    <tr>
       <td>User view provider type:</td>
       <td>
         <select name="UserViewProviderType" id="UserViewProviderType">
